@@ -145,6 +145,6 @@ void servosInit(void);
 void servosFilterInit(void);
 void servoMixer(void);
 // tricopter specific
-void servosTricopterInit(void);
-void servosTricopterMixer(void);
-bool servosTricopterIsEnabledServoUnarmed(void);
+// HJI void servosTricopterInit(void);
+// HJI void servosTricopterMixer(void);
+// HJI bool servosTricopterIsEnabledServoUnarmed(void);

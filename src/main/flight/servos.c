@@ -47,6 +47,7 @@
 
 #include "flight/imu.h"
 #include "flight/mixer.h"
+#include "flight/mixer_tricopter.h"
 #include "flight/pid.h"
 #include "flight/servos.h"
 
@@ -234,7 +235,7 @@ void servosInit(void)
     }
 
     if (mixerIsTricopter()) {
-        servosTricopterInit();
+        triInitMixer(servoParamsMutable(SERVO_RUDDER), &servo[SERVO_RUDDER]);
     }
 }
 
@@ -337,9 +338,9 @@ void writeServos(void)
     case MIXER_TRI:
     case MIXER_CUSTOM_TRI:
         // We move servo if unarmed flag set or armed
-        if (!(servosTricopterIsEnabledServoUnarmed() || ARMING_FLAG(ARMED))) {
-            servo[SERVO_RUDDER] = 0; // kill servo signal completely.
-        }
+// HJI         if (!(servosTricopterIsEnabledServoUnarmed() || ARMING_FLAG(ARMED))) {
+// HJI            servo[SERVO_RUDDER] = 0; // kill servo signal completely.
+// HJI        }
         writeServoWithTracking(servoIndex++, SERVO_RUDDER);
         break;
 
@@ -489,8 +490,6 @@ static void servoTable(void)
     switch (currentMixerMode) {
     case MIXER_CUSTOM_TRI:
     case MIXER_TRI:
-        servosTricopterMixer();
-        break;
     case MIXER_CUSTOM_AIRPLANE:
     case MIXER_FLYING_WING:
     case MIXER_AIRPLANE:

@@ -24,6 +24,8 @@
 
 #define DSHOT_MIN_THROTTLE       48
 #define DSHOT_MAX_THROTTLE     2047
+#define DSHOT_3D_DEADBAND_LOW         1047
+#define DSHOT_3D_DEADBAND_HIGH        1048
 #define DSHOT_3D_FORWARD_MIN_THROTTLE 1048
 
 #define MIN_GCR_EDGES         7

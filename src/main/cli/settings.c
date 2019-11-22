@@ -53,6 +53,7 @@
 #include "flight/gps_rescue.h"
 #include "flight/imu.h"
 #include "flight/mixer.h"
+#include "flight/mixer_tricopter.h"
 #include "flight/pid.h"
 #include "flight/position.h"
 #include "flight/rpm_filter.h"
@@ -481,6 +482,9 @@ static const char* const lookupTableDshotBitbangedTimer[] = {
     "AUTO", "TIM1", "TIM8"
 };
 
+static const char * const lookupServoFeedback[] = {
+    "VIRTUAL", "RSSI", "CURRENT"
+};
 
 #define LOOKUP_TABLE_ENTRY(name) { name, ARRAYLEN(name) }
 
@@ -599,6 +603,8 @@ const lookupTableEntry_t lookupTables[] = {
     LOOKUP_TABLE_ENTRY(lookupTableOffOnAuto),
     LOOKUP_TABLE_ENTRY(lookupTableInterpolatedSetpoint),
     LOOKUP_TABLE_ENTRY(lookupTableDshotBitbangedTimer),
+
+    LOOKUP_TABLE_ENTRY(lookupServoFeedback),
 };
 
 #undef LOOKUP_TABLE_ENTRY
@@ -1563,6 +1569,18 @@ const clivalue_t valueTable[] = {
 
 // PG_POSITION
     { "position_alt_source",           VAR_INT8   | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_POSITION_ALT_SOURCE }, PG_POSITION, offsetof(positionConfig_t, altSource) },
+
+// TRIFLIGHT
+    { "tri_motor_acc_yaw_correction",  VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = {  0,    20 }, PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_motor_acc_yaw_correction) },
+    { "tri_motor_acceleration",        VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = {  1,   100 }, PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_motor_acceleration) },
+    { "tri_servo_angle_at_max",        VAR_INT16  | MASTER_VALUE, .config.minmax         = {  0,   400 }, PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_angle_at_max) },
+    { "tri_servo_feedback",            VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_TRI_SERVO_FDBK }, PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_feedback) },
+    { "tri_servo_max_adc",             VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = {  0, 65535 }, PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_max_adc) },
+    { "tri_servo_mid_adc",             VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = {  0, 65535 }, PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_mid_adc) },
+    { "tri_servo_min_adc",             VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = {  0, 65535 }, PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_min_adc) },
+    { "tri_tail_motor_thrustfactor",   VAR_INT16  | MASTER_VALUE, .config.minmax         = { 10,   400 }, PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_tail_motor_thrustfactor) },
+    { "tri_tail_servo_speed",          VAR_INT16  | MASTER_VALUE, .config.minmax         = {  0,  1000 }, PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_tail_servo_speed) },
+    { "tri_yaw_boost",                 VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 10,   700 }, PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_yaw_boost) },
 };
 
 const uint16_t valueTableEntryCount = ARRAYLEN(valueTable);

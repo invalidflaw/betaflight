@@ -94,6 +94,7 @@
 #include "flight/failsafe.h"
 #include "flight/imu.h"
 #include "flight/mixer.h"
+#include "flight/mixer_tricopter.h"
 #include "flight/pid.h"
 #include "flight/rpm_filter.h"
 #include "flight/servos.h"
@@ -652,6 +653,22 @@ void init(void)
 
     // The FrSky D SPI RX sends RSSI_ADC_PIN (if configured) as A2
     adcConfigMutable()->rssi.enabled = featureIsEnabled(FEATURE_RSSI_ADC);
+
+    if (mixerIsTricopter() && featureIsEnabled(FEATURE_TRIFLIGHT)) {
+        if ((triflightConfig()->tri_servo_feedback == TRI_SERVO_FB_RSSI) &&
+            !featureIsEnabled(FEATURE_RSSI_ADC)) {
+            adcConfigMutable()->rssi.enabled = true;
+        }
+        if ((triflightConfig()->tri_servo_feedback == TRI_SERVO_FB_CURRENT) &&
+            (batteryConfig()->currentMeterSource != CURRENT_METER_ADC)) {
+            adcConfigMutable()->current.enabled = true;
+        }
+#ifdef EXTERNAL1_ADC_PIN
+        if (triflightConfig()->tri_servo_feedback == TRI_SERVO_FB_EXT1) {
+            adcConfigMutable()->external1.enabled = true;
+        }
+#endif
+    }
 #ifdef USE_RX_SPI
     adcConfigMutable()->rssi.enabled |= (featureIsEnabled(FEATURE_RX_SPI) && rxSpiConfig()->rx_spi_protocol == RX_SPI_FRSKY_D);
 #endif
@@ -728,6 +745,11 @@ void init(void)
     }
     LED0_OFF;
     LED1_OFF;
+
+    if (mixerIsTricopter() && featureIsEnabled(FEATURE_TRIFLIGHT))
+    {
+        triInitFilters();
+    }
 
     imuInit();
 

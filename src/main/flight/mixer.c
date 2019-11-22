@@ -351,7 +351,7 @@ void mixerInit(mixerMode_e mixerMode)
     currentMixerMode = mixerMode;
 
     initEscEndpoints();
-#ifdef USE_SERVOS
+#if 0 // HJI def USE_SERVOS
     if (mixerIsTricopter()) {
         mixerTricopterInit();
     }
@@ -704,7 +704,7 @@ static void applyMixToMotors(float motorMix[MAX_SUPPORTED_MOTORS], motorMixer_t 
 #endif
         motorOutput = motorOutputMin + motorOutputRange * motorOutput;
 
-#ifdef USE_SERVOS
+#if 0 // HJI def USE_SERVOS
         if (mixerIsTricopter()) {
             motorOutput += mixerTricopterMotorCorrection(i);
         }
@@ -937,4 +937,39 @@ void mixerSetThrottleAngleCorrection(int correctionValue)
 float mixerGetLoggingThrottle(void)
 {
     return loggingThrottle;
+}
+
+uint16_t mixGetMotorOutputLow(void)
+{
+    uint16_t motorOutputLow;
+
+#ifdef USE_DSHOT
+    if (isMotorProtocolDshot()) {
+        if (featureIsEnabled(FEATURE_3D))
+            motorOutputLow = DSHOT_MIN_THROTTLE + lrintf(((DSHOT_3D_DEADBAND_LOW - DSHOT_MIN_THROTTLE) * motorConfig()->digitalIdleOffsetValue) * 0.0001f);
+        else
+            motorOutputLow = DSHOT_MIN_THROTTLE + lrintf(((DSHOT_MAX_THROTTLE - DSHOT_MIN_THROTTLE) * motorConfig()->digitalIdleOffsetValue) * 0.0001f);
+    } else
+#endif
+    {
+        motorOutputLow = motorConfig()->minthrottle;
+    }
+
+    return motorOutputLow;
+}
+
+uint16_t mixGetMotorOutputHigh(void)
+{
+    uint16_t motorOutputHigh;
+
+#ifdef USE_DSHOT
+    if (isMotorProtocolDshot()) {
+        motorOutputHigh = DSHOT_MAX_THROTTLE;
+    } else
+#endif
+    {
+        motorOutputHigh = motorConfig()->maxthrottle;
+    }
+
+    return motorOutputHigh;
 }
