@@ -76,6 +76,8 @@ static FAST_RAM_ZERO_INIT bool pidStabilisationEnabled;
 
 static FAST_RAM_ZERO_INIT bool inCrashRecoveryMode = false;
 
+static FAST_RAM_ZERO_INIT float expectedGyroError[3];
+
 static FAST_RAM_ZERO_INIT float dT;
 static FAST_RAM_ZERO_INIT float pidFrequency;
 
@@ -1397,7 +1399,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
         // b = 1 and only c (feedforward weight) can be tuned (amount derivative on measurement or error).
 
         // -----calculate P component
-        pidData[axis].P = pidCoefficient[axis].Kp * errorRate * tpaFactorKp;
+        pidData[axis].P = pidCoefficient[axis].Kp * (errorRate + expectedGyroError[axis]) * tpaFactorKp;
         if (axis == FD_YAW) {
             pidData[axis].P = ptermYawLowpassApplyFn((filter_t *) &ptermYawLowpass, pidData[axis].P);
         }
@@ -1623,4 +1625,9 @@ float pidGetDT()
 float pidGetPidFrequency()
 {
     return pidFrequency;
+}
+
+void pidSetExpectedGyroError(flight_dynamics_index_t axis, float error)
+{
+    expectedGyroError[axis] = error;
 }

@@ -704,9 +704,9 @@ static void applyMixToMotors(float motorMix[MAX_SUPPORTED_MOTORS], motorMixer_t 
 #endif
         motorOutput = motorOutputMin + motorOutputRange * motorOutput;
 
-#if 0 // HJI def USE_SERVOS
-        if (mixerIsTricopter()) {
-            motorOutput += mixerTricopterMotorCorrection(i);
+#ifdef USE_SERVOS
+        if (mixerIsTricopter() && featureIsEnabled(FEATURE_TRIFLIGHT)) {
+            motorOutput += triGetMotorCorrection(i);
         }
 #endif
         if (failsafeIsActive()) {

@@ -170,3 +170,5 @@ bool isUsingSticksForArming(void);
 
 int32_t getRcStickDeflection(int32_t axis, uint16_t midrc);
 void rcControlsInit(void);
+
+bool isAirmodeActive(void);

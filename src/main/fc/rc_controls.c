@@ -398,3 +398,7 @@ void rcControlsInit(void)
     analyzeModeActivationConditions();
     isUsingSticksToArm = !isModeActivationConditionPresent(BOXARM);
 }
+
+bool isAirmodeActive(void) {
+    return (IS_RC_MODE_ACTIVE(BOXAIRMODE) || featureIsEnabled(FEATURE_AIRMODE));
+}

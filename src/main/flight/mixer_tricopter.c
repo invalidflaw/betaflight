@@ -63,7 +63,7 @@ PG_RESET_TEMPLATE(triflightConfig_t, triflightConfig,
     .tri_tail_servo_speed         = 300,
     .tri_yaw_boost                = 100,
 );
-/* HJI
+
 enum {
     DEBUG_TRI_MOTOR_CORRECTION                      = 0,
     DEBUG_TRI_TAIL_MOTOR                            = 1,
@@ -73,10 +73,10 @@ enum {
 
 static const uint8_t TRI_TAIL_MOTOR_INDEX = 0;
 
-static uint32_t preventArmingFlags = 0; HJI */
+static uint32_t preventArmingFlags = 0;
 static tailMotor_t tailMotor       = { .virtualFeedBack = 1000.0f };
 static tailServo_t tailServo       = { .angle = TRI_TAIL_SERVO_ANGLE_MID, .ADCChannel = ADC_RSSI };
-//static tailTune_t tailTune         = { .mode = TT_MODE_NONE };
+static tailTune_t tailTune         = { .mode = TT_MODE_NONE };
 static int8_t triServoDirection;
 
 // Tail motor correction per servo angle. Index 0 is angle TRI_CURVE_FIRST_INDEX_ANGLE.
@@ -85,26 +85,26 @@ static float motorPitchCorrectionCurve[TRI_YAW_FORCE_CURVE_SIZE];
 static float yawOutputGainCurve[TRI_YAW_FORCE_CURVE_SIZE];
 
 static float         binarySearchOutput(float yawOutput, float motorWoPitchCorr);
-//static void          checkArmingPrevent(void);
-//static float         feedbackServoStep(uint16_t tailServoADC);
-//static float         getAngleForYawOutput(float yawOutput);
-//static uint16_t      getLinearServoValue(servoParam_t *servoConf, float scaledPIDOutput, float pidSumLimit);
-//static float         getPitchCorrectionAtTailAngle(float angle, float thrustFactor);
-//static float         getServoAngle(servoParam_t *servoConf, uint16_t servoValue);
+static void          checkArmingPrevent(void);
+static float         feedbackServoStep(uint16_t tailServoADC);
+static float         getAngleForYawOutput(float yawOutput);
+static uint16_t      getLinearServoValue(servoParam_t *servoConf, float scaledPIDOutput, float pidSumLimit);
+static float         getPitchCorrectionAtTailAngle(float angle, float thrustFactor);
+static float         getServoAngle(servoParam_t *servoConf, uint16_t servoValue);
 static AdcChannel    getServoFeedbackADCChannel(uint8_t tri_servo_feedback);
-//static uint16_t      getServoValueAtAngle(servoParam_t *servoConf, float angle);
+static uint16_t      getServoValueAtAngle(servoParam_t *servoConf, float angle);
 static void          initYawForceCurve(void);
-//static void          predictGyroOnDeceleration(void);
-//static void          preventArming(triArmingPreventFlag_e flag, _Bool enable);
-//static void          tailMotorStep(int16_t setpoint, float dT);
-//static void          tailTuneModeServoSetup(struct servoSetup_t *pSS, servoParam_t *pServoConf, int16_t *pServoVal, float dT);
-//static void          tailTuneModeThrustTorque(thrustTorque_t *pTT, const bool isThrottleHigh);
+static void          predictGyroOnDeceleration(void);
+static void          preventArming(triArmingPreventFlag_e flag, _Bool enable);
+static void          tailMotorStep(int16_t setpoint, float dT);
+static void          tailTuneModeServoSetup(struct servoSetup_t *pSS, servoParam_t *pServoConf, int16_t *pServoVal, float dT);
+static void          tailTuneModeThrustTorque(thrustTorque_t *pTT, const bool isThrottleHigh);
 static int8_t        triGetServoDirection(void);
-//static void          triTailTuneStep(servoParam_t *pServoConf, int16_t *pServoVal, float dT);
-//static void          updateServoAngle(float dT);
-//static float         virtualServoStep(float currentAngle, int16_t servoSpeed,
-//                                      float dT, servoParam_t *servoConf,
-//                                      uint16_t servoValue);
+static void          triTailTuneStep(servoParam_t *pServoConf, int16_t *pServoVal, float dT);
+static void          updateServoAngle(float dT);
+static float         virtualServoStep(float currentAngle, int16_t servoSpeed,
+                                      float dT, servoParam_t *servoConf,
+                                      uint16_t servoValue);
 
 void triInitMixer(servoParam_t *pTailServoConfig, int16_t *pTailServoOutput)
 {
@@ -157,7 +157,7 @@ static void initYawForceCurve(void)
 
         yawOutputGainCurve[i] = -tailServo.thrustFactor * cosf(angleRad) - sinf(angleRad);
         
-//        motorPitchCorrectionCurve[i] = tailMotor.pitchCorrectionGain * getPitchCorrectionAtTailAngle(angleRad, tailServo.thrustFactor);
+        motorPitchCorrectionCurve[i] = tailMotor.pitchCorrectionGain * getPitchCorrectionAtTailAngle(angleRad, tailServo.thrustFactor);
         
         // Only calculate the top forces in the configured angle range
         if ((angle >= minAngle) && (angle <= maxAngle)) {
@@ -188,7 +188,7 @@ static void initYawForceCurve(void)
     tailServo.angleAtLinearMin = minLinearAngle;
     tailServo.angleAtLinearMax = maxLinearAngle;
 }
-/* HJI
+
 float triGetCurrentServoAngle(void)
 {
     return tailServo.angle;
@@ -208,7 +208,6 @@ static uint16_t getLinearServoValue(servoParam_t *servoConf, float scaledPIDOutp
 
 void triServoMixer(float scaledYawPid, float pidSumLimit, float dT)
 {
-        
     // Update the tail motor speed from feedback
     tailMotorStep(motor[TRI_TAIL_MOTOR_INDEX], dT);
 
@@ -334,7 +333,7 @@ static float getPitchCorrectionAtTailAngle(float angle, float thrustFactor)
     
     return motorCorrection;
 }
-HJI */
+
 static float binarySearchOutput(float yawOutput, float motorWoPitchCorr)
 {
     int32_t lower = 0;
@@ -357,7 +356,7 @@ static float binarySearchOutput(float yawOutput, float motorWoPitchCorr)
 
     return angle;
 }
-/* HJI
+
 static float getAngleForYawOutput(float yawOutput)
 {
     float angle;
@@ -470,7 +469,7 @@ static void updateServoAngle(float dT)
         preventArming(TRI_ARMING_PREVENT_FLAG_INVALID_SERVO_ANGLE, false);
     }
 }
-HJI */
+
 static AdcChannel getServoFeedbackADCChannel(uint8_t tri_servo_feedback)
 {
     AdcChannel channel;
@@ -494,7 +493,7 @@ static AdcChannel getServoFeedbackADCChannel(uint8_t tri_servo_feedback)
 
     return channel;
 }
-/* HJI
+
 static void predictGyroOnDeceleration(void)
 {
     static float previousMotorSpeed = 1000.0f;
@@ -552,14 +551,14 @@ static void tailMotorStep(int16_t setpoint, float dT)
     
     DEBUG_SET(DEBUG_TRIFLIGHT, DEBUG_TRI_TAIL_MOTOR, tailMotor.virtualFeedBack);
 }
-HJI */
+
 static int8_t triGetServoDirection(void)
 {
     const int8_t direction = (int8_t)servoDirection(SERVO_RUDDER, INPUT_STABILIZED_YAW);
 
     return direction;
 }
-/* HJI
+
 static void preventArming(triArmingPreventFlag_e flag, _Bool enable)
 {
     if (enable) {
@@ -921,4 +920,3 @@ static void tailTuneModeServoSetup(struct servoSetup_t *pSS, servoParam_t *pServ
     }
     *pServoVal = pSS->servoVal;
 }
-HJI */

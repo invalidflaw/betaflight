@@ -262,3 +262,5 @@ float pidGetDT();
 float pidGetPidFrequency();
 float pidGetFfBoostFactor();
 float pidGetSpikeLimitInverse();
+
+void pidSetExpectedGyroError(flight_dynamics_index_t axis, float error);
