@@ -61,7 +61,7 @@ PG_RESET_TEMPLATE(triflightConfig_t, triflightConfig,
     .tri_servo_min_adc            = 0,
     .tri_tail_motor_thrustfactor  = 138,
     .tri_tail_servo_speed         = 300,
-    .tri_yaw_boost                = 100,
+    .tri_yaw_boost                = 10,
 );
 
 enum {
