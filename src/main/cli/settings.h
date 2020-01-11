@@ -139,6 +139,8 @@ typedef enum {
     TABLE_INTERPOLATED_SP,
     TABLE_DSHOT_BITBANGED_TIMER,
 
+    TABLE_TRI_SERVO_FDBK,
+
     LOOKUP_TABLE_COUNT
 } lookupTableIndex_e;
 

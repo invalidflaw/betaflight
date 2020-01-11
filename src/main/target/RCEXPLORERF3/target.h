@@ -47,28 +47,28 @@
 
 #define GYRO_1_ALIGN       CW180_DEG
 
-#define USE_BARO
-#define USE_BARO_MS5611
+//#define USE_BARO
+//#define USE_BARO_MS5611
 
-#define USE_MAG
-#define USE_MAG_AK8975
-#define USE_MAG_HMC5883 // External
+//#define USE_MAG
+//#define USE_MAG_AK8975
+//#define USE_MAG_HMC5883 // External
 
-#define MAG_AK8975_ALIGN CW180_DEG
+//#define MAG_AK8975_ALIGN CW180_DEG
 
-#define USE_RANGEFINDER
-#define USE_RANGEFINDER_HCSR04
-#define RANGEFINDER_HCSR04_TRIGGER_PIN           PA6   // RC_CH7 (PB0) - only 3.3v ( add a 1K Ohms resistor )
-#define RANGEFINDER_HCSR04_ECHO_PIN              PB1   // RC_CH8 (PB1) - only 3.3v ( add a 1K Ohms resistor )
+//#define USE_RANGEFINDER
+//#define USE_RANGEFINDER_HCSR04
+//#define RANGEFINDER_HCSR04_TRIGGER_PIN           PA6   // RC_CH7 (PB0) - only 3.3v ( add a 1K Ohms resistor )
+//#define RANGEFINDER_HCSR04_ECHO_PIN              PB1   // RC_CH8 (PB1) - only 3.3v ( add a 1K Ohms resistor )
 
 #define USE_VCP
 #define USE_UART1
 #define USE_UART2
 #define USE_UART3
-#define USE_SOFTSERIAL1
-#define USE_SOFTSERIAL2
+//#define USE_SOFTSERIAL1
+//#define USE_SOFTSERIAL2
 
-#define SERIAL_PORT_COUNT 6
+#define SERIAL_PORT_COUNT 4
 
 #define USE_ESCSERIAL
 #define ESCSERIAL_TIMER_TX_PIN  PA8  // (HARDARE=0)
@@ -109,8 +109,8 @@
 #define SERIALRX_PROVIDER       SERIALRX_SBUS
 #define SERIALRX_UART           SERIAL_PORT_USART1
 
-#define USE_GPS_UBLOX
-#define USE_GPS_NMEA
+//#define USE_GPS_UBLOX
+//#define USE_GPS_NMEA
 
 #define TARGET_IO_PORTA 0xffff
 #define TARGET_IO_PORTB 0xffff

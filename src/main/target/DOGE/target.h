@@ -36,7 +36,7 @@
 
 #define USE_SPI
 #define USE_SPI_DEVICE_1
-#define USE_SPI_DEVICE_2
+//#define USE_SPI_DEVICE_2
 
 // tqfp48 pin 39
 #define SPI1_SCK_PIN            PB3
@@ -61,14 +61,14 @@
 #define GYRO_1_SPI_INSTANCE     SPI1
 
 // tqfp48 pin 25
-#define BARO_CS_PIN             SPI2_NSS_PIN
-#define BARO_SPI_INSTANCE       SPI2
+//#define BARO_CS_PIN             SPI2_NSS_PIN
+//#define BARO_SPI_INSTANCE       SPI2
 
-#define USE_FLASHFS
-#define USE_FLASH_M25P16
-#define FLASH_SPI_SHARED
-#define FLASH_CS_PIN            PC15
-#define FLASH_SPI_INSTANCE      SPI2
+//#define USE_FLASHFS
+//#define USE_FLASH_M25P16
+//#define FLASH_SPI_SHARED
+//#define FLASH_CS_PIN            PC15
+//#define FLASH_SPI_INSTANCE      SPI2
 
 #define USE_GYRO
 #define USE_GYRO_SPI_MPU6500
@@ -79,18 +79,18 @@
 #define USE_ACC_SPI_MPU6500
 #define USE_ACC_SPI_MPU6000
 
-#define USE_BARO
-#define USE_BARO_BMP280
-#define USE_BARO_SPI_BMP280
+//#define USE_BARO
+//#define USE_BARO_BMP280
+//#define USE_BARO_SPI_BMP280
 
 #define USE_VCP
 #define USE_UART1
 #define USE_UART2
 #define USE_UART3
-#define USE_SOFTSERIAL1
-#define USE_SOFTSERIAL2
+//#define USE_SOFTSERIAL1
+//#define USE_SOFTSERIAL2
 
-#define SERIAL_PORT_COUNT 6
+#define SERIAL_PORT_COUNT 4
 
 #define USE_ESCSERIAL
 #define ESCSERIAL_TIMER_TX_PIN  PA8 // (Hardware=0)
@@ -110,6 +110,7 @@
 #define ADC24_DMA_REMAP // moves ADC2 DMA from DMA2ch1 to DMA2ch3.
 #define VBAT_ADC_PIN            PA4
 #define CURRENT_METER_ADC_PIN   PA5
+#define RSSI_ADC_PIN            PA6
 
 // mpu_int definition in sensors/initialisation.c
 #define USE_EXTI

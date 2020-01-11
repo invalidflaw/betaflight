@@ -351,11 +351,6 @@ void mixerInit(mixerMode_e mixerMode)
     currentMixerMode = mixerMode;
 
     initEscEndpoints();
-#ifdef USE_SERVOS
-    if (mixerIsTricopter()) {
-        mixerTricopterInit();
-    }
-#endif
 #ifdef USE_DYN_IDLE
     idleMinMotorRps = currentPidProfile->idle_min_rpm * 100.0f / 60.0f;
     idleMaxIncrease = currentPidProfile->idle_max_increase * 0.001f;
@@ -705,8 +700,8 @@ static void applyMixToMotors(float motorMix[MAX_SUPPORTED_MOTORS], motorMixer_t 
         motorOutput = motorOutputMin + motorOutputRange * motorOutput;
 
 #ifdef USE_SERVOS
-        if (mixerIsTricopter()) {
-            motorOutput += mixerTricopterMotorCorrection(i);
+        if (mixerIsTricopter() && featureIsEnabled(FEATURE_TRIFLIGHT)) {
+            motorOutput += triGetMotorCorrection(i);
         }
 #endif
         if (failsafeIsActive()) {
@@ -937,4 +932,14 @@ void mixerSetThrottleAngleCorrection(int correctionValue)
 float mixerGetLoggingThrottle(void)
 {
     return loggingThrottle;
+}
+
+float getMotorOutputLow(void)
+{
+	return motorOutputLow;
+}
+
+float getMotorOutputHigh(void)
+{
+	return motorOutputHigh;
 }
