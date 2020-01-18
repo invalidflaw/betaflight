@@ -746,11 +746,6 @@ void init(void)
     LED0_OFF;
     LED1_OFF;
 
-    if (mixerIsTricopter() && featureIsEnabled(FEATURE_TRIFLIGHT))
-    {
-        triInitFilters();
-    }
-
     imuInit();
 
     mspInit();

@@ -38,10 +38,7 @@
 #define MOTOR_ACCELERATION_MAX       (100)
 
 #define TAIL_SERVO_ANGLE_MAX_MIN     (0)
-#define TAIL_SERVO_ANGLE_MAX_MAX     (500)
-
-#define TAIL_SERVO_FDBK_MIN         (0)
-#define TAIL_SERVO_FDBK_MAX         (2)
+#define TAIL_SERVO_ANGLE_MAX_MAX     (400)
 
 #define TAIL_SERVO_MAX_ADC_MIN      (0)
 #define TAIL_SERVO_MAX_ADC_MAX      (65535)
@@ -64,16 +61,16 @@
 typedef struct triflightConfig_s {
     int16_t tri_dynamic_yaw_minthrottle;
     int16_t tri_dynamic_yaw_maxthrottle;
-	int16_t tri_dynamic_yaw_hoverthrottle;
-	uint16_t tri_motor_acc_yaw_correction;
-	uint16_t tri_motor_acceleration;
-	int16_t  tri_servo_angle_at_max;
-	uint8_t  tri_servo_feedback;
+    int16_t tri_dynamic_yaw_hoverthrottle;
+    uint16_t tri_motor_acc_yaw_correction;
+    uint16_t tri_motor_acceleration;
+    int16_t  tri_servo_angle_at_max;
+    uint8_t  tri_servo_feedback;
     uint16_t tri_servo_max_adc;
     uint16_t tri_servo_mid_adc;
     uint16_t tri_servo_min_adc;
-	int16_t  tri_tail_motor_thrustfactor;
-	int16_t  tri_tail_servo_speed;
+    int16_t  tri_tail_motor_thrustfactor;
+    int16_t  tri_tail_servo_speed;
 } triflightConfig_t;
 
 PG_DECLARE(triflightConfig_t, triflightConfig);
@@ -88,7 +85,6 @@ typedef enum {
 uint16_t triGetCurrentServoAngle(void);
 int16_t  triGetMotorCorrection(uint8_t motorIndex);
 void     triServoMixer(int16_t PIDoutput);
-void     triInitFilters(void);
 void     triInitMixer(servoParam_t *pTailServoConfig, int16_t *pTailServo);
 _Bool    triIsEnabledServoUnarmed(void);
 
