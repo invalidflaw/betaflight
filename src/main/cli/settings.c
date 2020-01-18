@@ -1591,6 +1591,8 @@ const clivalue_t valueTable[] = {
 	                                   PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_mid_adc) },
     { "tri_servo_min_adc",             VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { TAIL_SERVO_MIN_ADC_MIN, TAIL_SERVO_MIN_ADC_MAX },
 	                                   PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_min_adc) },
+    { "tri_tail_motor_index",          VAR_UINT8  | MASTER_VALUE, .config.minmax         = { TAIL_MOTOR_INDEX_MIN, TAIL_MOTOR_INDEX_MAX },
+	                                   PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_tail_motor_index) },
     { "tri_tail_motor_thrustfactor",   VAR_INT16  | MASTER_VALUE, .config.minmax         = { TAIL_THRUST_FACTOR_MIN, TAIL_THRUST_FACTOR_MAX },
 	                                   PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_tail_motor_thrustfactor) },
     { "tri_tail_servo_speed",          VAR_INT16  | MASTER_VALUE, .config.minmax         = { TAIL_SERVO_SPEED_MIN, TAIL_SERVO_SPEED_MAX },
