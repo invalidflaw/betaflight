@@ -32,6 +32,8 @@
 
 #endif
 
+#define USE_TARGET_CONFIGURATION
+
 //LEDs
 #if defined(PIRXF4)
 #define LED0_PIN                PC13
@@ -45,8 +47,9 @@
 
 //define camera control
 #if defined(PIRXF4)
-#define USE_CAMERA_CONTROL
-#define CAMERA_CONTROL_PIN PA4
+// XXX CAMERA_CONTROL_PIN is deprecated.
+// XXX Target maintainer must create a valid timerHardware[] array entry for PA4 with TIM_USE_CAMERA_CONTROL
+//#define CAMERA_CONTROL_PIN PA4
 #endif
 
 //BEEPER

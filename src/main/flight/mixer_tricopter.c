@@ -27,7 +27,6 @@
 
 #include "drivers/time.h"
 
-#include "fc/config.h"
 #include "fc/rc_controls.h"
 #include "fc/rc_modes.h"
 #include "fc/runtime_config.h"
@@ -43,6 +42,8 @@
 #include "pg/pg_ids.h"
 
 #include "sensors/gyro.h"
+
+#include "config/config.h"
 
 #define TRI_TAIL_SERVO_ANGLE_MID    (900)
 #define TRI_YAW_FORCE_CURVE_SIZE    (100)
