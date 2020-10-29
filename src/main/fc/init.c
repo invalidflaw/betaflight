@@ -156,6 +156,7 @@
 
 #include "rx/rx.h"
 #include "rx/spektrum.h"
+#include "rx/rx_spi.h"
 
 #include "scheduler/scheduler.h"
 

@@ -81,7 +81,7 @@
 
 #ifdef STM32F7
 #define USE_SRAM2
-#define USE_ITCM_RAM
+//#define USE_ITCM_RAM
 #define USE_FAST_RAM
 #define USE_DSHOT
 #define USE_DSHOT_BITBANG
