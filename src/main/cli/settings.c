@@ -498,6 +498,10 @@ static const char * const lookupServoFeedback[] = {
     "VIRTUAL", "RSSI", "CURRENT"
 };
 
+static const char * const lookupServoDirection[] = {
+    "NORMAL", "REVERSE"
+};
+
 #define LOOKUP_TABLE_ENTRY(name) { name, ARRAYLEN(name) }
 
 const lookupTableEntry_t lookupTables[] = {
@@ -620,6 +624,7 @@ const lookupTableEntry_t lookupTables[] = {
 #endif
 
     LOOKUP_TABLE_ENTRY(lookupServoFeedback),
+	LOOKUP_TABLE_ENTRY(lookupServoDirection),
 };
 
 #undef LOOKUP_TABLE_ENTRY
@@ -1647,6 +1652,8 @@ const clivalue_t valueTable[] = {
                                        PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_angle_at_max) },
     { "tri_servo_feedback",            VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_TRI_SERVO_FDBK },
                                        PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_feedback) },
+    { "tri_servo_direction",           VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_TRI_SERVO_DIRECTION },
+                                       PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_direction) },
     { "tri_servo_max_adc",             VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { TAIL_SERVO_MAX_ADC_MIN, TAIL_SERVO_MAX_ADC_MAX },
 	                                   PG_TRIFLIGHT_CONFIG, offsetof(triflightConfig_t, tri_servo_max_adc) },
     { "tri_servo_mid_adc",             VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { TAIL_SERVO_MID_ADC_MIN, TAIL_SERVO_MID_ADC_MAX },

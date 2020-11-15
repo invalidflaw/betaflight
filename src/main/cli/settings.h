@@ -142,6 +142,8 @@ typedef enum {
 #endif
 
     TABLE_TRI_SERVO_FDBK,
+	
+	TABLE_TRI_SERVO_DIRECTION,
 
     LOOKUP_TABLE_COUNT
 } lookupTableIndex_e;

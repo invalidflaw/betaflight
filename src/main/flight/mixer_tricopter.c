@@ -64,6 +64,7 @@ PG_RESET_TEMPLATE(triflightConfig_t, triflightConfig,
     .tri_motor_acceleration        = 18,
     .tri_servo_angle_at_max        = 400,
     .tri_servo_feedback            = TRI_SERVO_FB_RSSI,
+    .tri_servo_direction           = TRI_SERVO_DIRECTION_NORMAL,
     .tri_servo_max_adc             = 0,
     .tri_servo_mid_adc             = 0,
     .tri_servo_min_adc             = 0,
@@ -83,6 +84,7 @@ static int16_t  tailMotorDecelerationDelay_angle;
 static int16_t  tailMotorPitchZeroAngle;
 static uint16_t tailServoADC         = 0;
 static uint16_t tailServoAngle       = TRI_TAIL_SERVO_ANGLE_MID;
+static uint8_t  tailServoDirection   = TRI_SERVO_DIRECTION_NORMAL;
 static int32_t  tailServoMaxYawForce = 0;
 static int16_t  tailServoMaxAngle    = 0;
 static int16_t  tailServoSpeed       = 0;
@@ -136,6 +138,7 @@ void triInitMixer(servoParam_t *pTailServoConfig, int16_t *pTailServo)
 {
     gpTailServoConf       = pTailServoConfig;
     gpTailServo           = pTailServo;
+    tailServoDirection    = triflightConfig()->tri_servo_direction;
     tailServoThrustFactor = triflightConfig()->tri_tail_motor_thrustfactor / 10.0f;
     tailServoMaxAngle     = triflightConfig()->tri_servo_angle_at_max;
     tailServoSpeed        = triflightConfig()->tri_tail_servo_speed;
@@ -267,21 +270,43 @@ int16_t triGetMotorCorrection(uint8_t motorIndex)
 
 static uint16_t getServoValueAtAngle(servoParam_t *servoConf, uint16_t angle)
 {
+    const int16_t servoMin = servoConf->min;
     const int16_t servoMid = servoConf->middle;
+    const int16_t servoMax = servoConf->max;
+
     uint16_t servoValue;
 
-    if (angle < TRI_TAIL_SERVO_ANGLE_MID)
+    if (tailServoDirection == TRI_SERVO_DIRECTION_NORMAL)
     {
-        const int16_t servoMin = servoConf->min;
-        servoValue = (int32_t)(angle - tailServoMaxAngle) * (servoMid - servoMin) / (TRI_TAIL_SERVO_ANGLE_MID - tailServoMaxAngle) + servoMin;
-    }
-    else if (angle > TRI_TAIL_SERVO_ANGLE_MID)
-    {
-        servoValue = (int32_t)(angle - TRI_TAIL_SERVO_ANGLE_MID) * (servoConf->max - servoMid) / tailServoMaxAngle + servoMid;
+        if (angle < TRI_TAIL_SERVO_ANGLE_MID)
+        {
+            servoValue = (int32_t)(angle - (TRI_TAIL_SERVO_ANGLE_MID - tailServoMaxAngle)) * (servoMid - servoMin) / 
+                                  (TRI_TAIL_SERVO_ANGLE_MID - (TRI_TAIL_SERVO_ANGLE_MID - tailServoMaxAngle)) + servoMin;
+        }
+        else if (angle > TRI_TAIL_SERVO_ANGLE_MID)
+        {
+            servoValue = (int32_t)(angle - TRI_TAIL_SERVO_ANGLE_MID) * (servoMax - servoMid) / tailServoMaxAngle + servoMid;
+        }
+        else
+        {
+            servoValue = servoMid;
+        }
     }
     else
     {
-        servoValue = servoMid;
+        if (angle < TRI_TAIL_SERVO_ANGLE_MID)
+        {
+            servoValue = servoMax - (int32_t)(angle - (TRI_TAIL_SERVO_ANGLE_MID - tailServoMaxAngle)) * (servoMid - servoMin) / 
+                         (TRI_TAIL_SERVO_ANGLE_MID - (TRI_TAIL_SERVO_ANGLE_MID - tailServoMaxAngle));
+        }
+        else if (angle > TRI_TAIL_SERVO_ANGLE_MID)
+        {
+            servoValue = servoMid - (int32_t)(angle - TRI_TAIL_SERVO_ANGLE_MID) * (servoMax - servoMid) / tailServoMaxAngle;
+        }
+        else
+        {
+            servoValue = servoMid;
+        }
     }
 
     return servoValue;
@@ -323,9 +348,17 @@ static uint16_t getAngleFromYawCurveAtForce(int32_t force)
 static uint16_t getServoAngle(servoParam_t *servoConf, uint16_t servoValue)
 {
     const int16_t midValue   = servoConf->middle;
+
     const int16_t endValue   = servoValue < midValue ? servoConf->min : servoConf->max;
-    const int16_t endAngle   = servoValue < midValue ? TRI_TAIL_SERVO_ANGLE_MID - tailServoMaxAngle : TRI_TAIL_SERVO_ANGLE_MID + tailServoMaxAngle;
-    const int16_t servoAngle = (int32_t)(endAngle - TRI_TAIL_SERVO_ANGLE_MID) * (servoValue - midValue) / (endValue - midValue) + TRI_TAIL_SERVO_ANGLE_MID;
+
+    const int16_t endAngle   = servoValue < midValue ? -tailServoMaxAngle : tailServoMaxAngle;
+
+    int16_t servoAngle;
+
+    if (tailServoDirection == TRI_SERVO_DIRECTION_NORMAL)
+        servoAngle = (int32_t)(endAngle) * (servoValue - midValue) / (endValue - midValue) + TRI_TAIL_SERVO_ANGLE_MID;
+    else
+        servoAngle = TRI_TAIL_SERVO_ANGLE_MID - (int32_t)(endAngle) * (servoValue - midValue) / (endValue - midValue);
     
     return servoAngle;
 }
@@ -379,14 +412,23 @@ static uint16_t virtualServoStep(uint16_t currentAngle, int16_t servoSpeed, floa
 
 static uint16_t feedbackServoStep(uint16_t tailServoADC)
 {
+    uint16_t feedbackAngle;
+
     // Feedback servo
     const int32_t ADCFeedback       = tailServoADC;
+	
     const int16_t midValue          = triflightConfig()->tri_servo_mid_adc;
-    const int16_t endValue          = ADCFeedback < midValue ? triflightConfig()->tri_servo_min_adc :triflightConfig()->tri_servo_max_adc;
-    const int16_t tailServoMaxAngle = triflightConfig()->tri_servo_angle_at_max;
-    const int16_t endAngle          = ADCFeedback < midValue ? TRI_TAIL_SERVO_ANGLE_MID - tailServoMaxAngle : TRI_TAIL_SERVO_ANGLE_MID + tailServoMaxAngle;
-    
-    return ((endAngle - TRI_TAIL_SERVO_ANGLE_MID) * (ADCFeedback - midValue) / (endValue - midValue) + TRI_TAIL_SERVO_ANGLE_MID);
+	
+    const int16_t endValue          = ADCFeedback < midValue ? triflightConfig()->tri_servo_min_adc : triflightConfig()->tri_servo_max_adc;
+	
+    const int16_t endAngle          = ADCFeedback < midValue ? -tailServoMaxAngle : tailServoMaxAngle;
+
+    if (tailServoDirection == TRI_SERVO_DIRECTION_NORMAL)
+	    feedbackAngle = endAngle * (ADCFeedback - midValue) / (endValue - midValue) + TRI_TAIL_SERVO_ANGLE_MID;
+    else
+	    feedbackAngle =  TRI_TAIL_SERVO_ANGLE_MID - endAngle * (ADCFeedback - midValue) / (endValue - midValue);	
+
+    return feedbackAngle;
 }
 
 static void updateServoAngle(void)
@@ -434,6 +476,11 @@ static int16_t dynamicYaw(int16_t PIDoutput)
         lowRange  = range * (triflightConfig()->tri_dynamic_yaw_hoverthrottle - (int32_t)getMotorOutputLow()) / range;
         highRange = range - lowRange;
     }
+
+#if 0
+    DEBUG_SET(DEBUG_TRIFLIGHT, 0, mixGetMotorOutputLow());
+    DEBUG_SET(DEBUG_TRIFLIGHT, 1, mixGetMotorOutputHigh());
+#endif
 
 #if 0
     DEBUG_SET(DEBUG_TRIFLIGHT, 0, range);
@@ -742,9 +789,18 @@ static void tailTuneModeServoSetup(struct servoSetup_t *pSS, servoParam_t *pServ
     // Check mode select
     if (isRcAxisWithinDeadband(PITCH) && (rcCommand[ROLL] < -100))
     {
-        pSS->servoVal       = pServoConf->min;
-        pSS->pLimitToAdjust = &pServoConf->min;
-        pSS->state          = SS_SETUP;
+        if (tailServoDirection == TRI_SERVO_DIRECTION_NORMAL)
+        {
+            pSS->servoVal       = pServoConf->min;
+            pSS->pLimitToAdjust = &pServoConf->min;
+        }
+        else
+        {
+            pSS->servoVal       = pServoConf->max;
+            pSS->pLimitToAdjust = &pServoConf->max;
+        }
+
+        pSS->state = SS_SETUP;
 
         beeperConfirmationBeeps(1);
     }
@@ -758,10 +814,19 @@ static void tailTuneModeServoSetup(struct servoSetup_t *pSS, servoParam_t *pServ
     }
     else if (isRcAxisWithinDeadband(PITCH) && (rcCommand[ROLL] > 100))
     {
-        pSS->servoVal       = pServoConf->max;
-        pSS->pLimitToAdjust = &pServoConf->max;
-        pSS->state          = SS_SETUP;
+        if (tailServoDirection == TRI_SERVO_DIRECTION_NORMAL)
+        {
+            pSS->servoVal       = pServoConf->max;
+            pSS->pLimitToAdjust = &pServoConf->max;
+        }
+        else
+        {
+            pSS->servoVal       = pServoConf->min;
+            pSS->pLimitToAdjust = &pServoConf->min;
+        }
 
+        pSS->state = SS_SETUP;
+        
         beeperConfirmationBeeps(3);
     }
     else if (isRcAxisWithinDeadband(ROLL) && (rcCommand[PITCH] < -100))
@@ -777,7 +842,10 @@ static void tailTuneModeServoSetup(struct servoSetup_t *pSS, servoParam_t *pServ
     case SS_SETUP:
         if (!isRcAxisWithinDeadband(YAW))
         {
-            pSS->servoVal += -1.0f * (float)rcCommand[YAW] * dT;
+            if (tailServoDirection == TRI_SERVO_DIRECTION_NORMAL)
+                pSS->servoVal += -1.0f * (float)rcCommand[YAW] * dT;
+            else
+                pSS->servoVal +=  1.0f * (float)rcCommand[YAW] * dT;
             
             constrain(pSS->servoVal, 950, 2050);
             
